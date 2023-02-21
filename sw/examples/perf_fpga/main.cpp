@@ -100,7 +100,9 @@ int main(int argc, char *argv[])
         // Fire
         cproc.setCSR(static_cast<uint64_t>(oper), static_cast<uint32_t>(BenchRegs::CTRL_REG));
 
+        // * Check completion by counting DONE signals from FPGA.
         while(cproc.getCSR(static_cast<uint32_t>(BenchRegs::DONE_REG)) < n_reps) ;
+        // * Get the timer value (described in the README).
         return (double)(cproc.getCSR(static_cast<uint32_t>(BenchRegs::TIMER_REG))) * clkNs;
     };
 

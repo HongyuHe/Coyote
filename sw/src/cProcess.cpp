@@ -35,7 +35,7 @@ cProcess::cProcess(int32_t vfid, pid_t pid, cSched *csched) : vfid(vfid), pid(pi
 {
 	DBG3("cProcess:  acquiring vfid " << vfid);
     
-	// Open
+	// * Open fpga device file with region ID.
 	std::string region = "/dev/fpga" + std::to_string(vfid);
 	fd = open(region.c_str(), O_RDWR | O_SYNC); 
 	if(fd == -1)
@@ -45,14 +45,15 @@ cProcess::cProcess(int32_t vfid, pid_t pid, cSched *csched) : vfid(vfid), pid(pi
 	uint64_t tmp[2];
 	tmp[0] = pid;
 	
-	// register pid
+	// * Register pid (tmp[0]) using the kernel module via the ioctl command `IOCTL_REGISTER_PID`.
+	// * Thereafter, driver returns the fid (tmp[1]).
 	if(ioctl(fd, IOCTL_REGISTER_PID, &tmp))
 		throw std::runtime_error("ioctl_register_pid() failed");
 
 	DBG3("cProcess:  registered pid: " << pid << ", cpid: " << tmp[1]);
 	cpid = tmp[1];
 
-	// Cnfg
+	// * Read config info from FPGA.
 	if(ioctl(fd, IOCTL_READ_CNFG, &tmp)) 
 		throw std::runtime_error("ioctl_read_cnfg() failed");
 
@@ -109,8 +110,10 @@ cProcess::~cProcess() {
 }
 
 /**
- * @brief MMap vFPGA control plane
+ * @brief MMaps vFPGA control plane
  * 
+ * * The ctrl/cnfg registers are accessible from the mapped based address with constant offsets (`mmapCtrl/Cnfg`).
+ * * These mapped register addresses are contiguous and grouped together.
  */
 void cProcess::mmapFpga() {
 	// Config 
