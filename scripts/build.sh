@@ -9,7 +9,7 @@ cd hw && mkdir build && cd build || exit
 /bin/cmake .. -DFDEV_NAME=u55c -DEXAMPLE="$EXAMPLE"
 make shell && make compile
 
-# * Copy to the cluster fs.
-scp ./cyt_top.bit honghe@alveo-build-01.ethz.ch:/home/honghe/fpga/bitstreams
-# * Program the static regions of the boards.
-/scripts/sgutil.sh /home/honghe/fpga/bitstreams/cyt_top.bit $BOARDS
+# # * Copy to bitstream.
+# cp ./cyt_top.bit honghe@alveo-build-01.ethz.ch:/mnt/scratch/honghe/bitstreams
+# # * Program the static regions of the boards.
+# /scripts/sgutil.sh /mnt/scratch/honghe/bitstreams/cyt_top.bit $BOARDS
